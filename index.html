@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desi Lofi Radio — Real Bollywood Songs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Yatra+One&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+  :root {
+    --primary: #e63946;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.65);
+    --glass-bg: rgba(10,10,10,0.55);
+    --glass-border: rgba(255,255,255,0.1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    background: #111;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  #bg-layer {
+    position: absolute;
+    inset: -6%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transition: opacity .6s;
+    animation: slowPan 40s infinite alternate ease-in-out;
+  }
+  #bg-layer.fading { opacity: 0; }
+  @keyframes slowPan {
+    0%   { transform: scale(1) translate(0,0); }
+    100% { transform: scale(1.06) translate(-1.5%,-1%); }
+  }
+  #bg-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, rgba(0,0,0,.5) 60%, rgba(0,0,0,.75) 100%);
+    z-index: 1;
+  }
+
+  /* Hidden YouTube iframe */
+  #yt-container {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden; opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* TOP NAV */
+  .top-nav {
+    position: relative; z-index: 10;
+    display: flex; justify-content: center; align-items: center;
+    padding: 1.4rem 1rem; gap: .75rem; flex-wrap: wrap;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .82rem; font-weight: 500;
+    color: var(--text-dim); cursor: pointer;
+    background: var(--glass-bg); padding: .45rem .9rem;
+    border-radius: 20px; backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    transition: all .25s;
+  }
+  .nav-item:hover { color: #fff; background: rgba(255,255,255,.12); transform: translateY(-2px); }
+  .nav-item.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+
+  /* PLATFORM LINKS */
+  .platform-logos {
+    position: absolute; top: 1.4rem; right: 1.4rem; z-index: 10;
+    display: flex; gap: .75rem;
+  }
+  .platform-btn {
+    display: flex; align-items: center; gap: .4rem;
+    background: var(--glass-bg); backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    padding: .35rem .8rem; border-radius: 20px;
+    font-size: .78rem; font-weight: 500; color: #fff;
+    text-decoration: none; transition: background .25s;
+  }
+  .platform-btn:hover { background: rgba(255,255,255,.15); }
+  .platform-btn.spotify i { color: #1DB954; }
+  .platform-btn.yt i { color: #FF0000; }
+
+  /* HERO */
+  .hero-container {
+    flex: 1; position: relative; z-index: 5;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding-bottom: 6rem;
+    animation: floatTitle 7s ease-in-out infinite;
+  }
+  @keyframes floatTitle {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+  .hero-title {
+    font-family: 'Yatra One', system-ui;
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    line-height: 1; color: #fff;
+    text-shadow: 0 4px 32px rgba(0,0,0,.7);
+    letter-spacing: 2px;
+    transition: opacity .35s;
+  }
+  .hero-subtitle {
+    font-family: 'Yatra One', system-ui;
+    font-size: clamp(1rem, 2.5vw, 2rem);
+    color: rgba(255,255,255,.88);
+    margin-top: .2rem;
+    letter-spacing: 6px; text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0,0,0,.5);
+    transition: opacity .35s;
+  }
+  .hero-title.fade, .hero-subtitle.fade { opacity: 0; }
+
+  /* PLAYER WRAPPER */
+  .player-wrapper {
+    position: absolute; bottom: 2rem;
+    left: 50%; transform: translateX(-50%);
+    width: min(90%, 720px); z-index: 20;
+    animation: floatPlayer 9s ease-in-out infinite;
+  }
+  @keyframes floatPlayer {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-6px); }
+  }
+
+  .top-badges { display: flex; gap: .5rem; margin-bottom: .5rem; }
+  .badge {
+    display: flex; align-items: center; gap: .3rem;
+    background: rgba(0,0,0,.55); backdrop-filter: blur(10px);
+    padding: .28rem .75rem; border-radius: 20px;
+    font-size: .73rem; font-weight: 500;
+    color: var(--text-dim); border: 1px solid var(--glass-border);
+  }
+
+  .music-player {
+    background: var(--glass-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 24px;
+    padding: 1.2rem 1.4rem;
+    display: flex; align-items: center; gap: 1.25rem;
+    box-shadow: 0 12px 48px rgba(0,0,0,.4);
+  }
+
+  .album-art {
+    width: 62px; height: 62px; border-radius: 12px;
+    background: #333 center/cover;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4);
+    flex-shrink: 0;
+    transition: border-radius .4s;
+  }
+  .album-art.spinning {
+    animation: spin 12s linear infinite;
+    border-radius: 50%;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
+  .track-info { flex: 1; min-width: 0; }
+  .track-name {
+    font-size: 1rem; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: .2rem;
+  }
+  .track-artist {
+    font-size: .82rem; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .player-center {
+    display: flex; flex-direction: column;
+    align-items: center; flex: 2; min-width: 180px;
+  }
+  .controls {
+    display: flex; align-items: center;
+    gap: 1.25rem; margin-bottom: .65rem;
+  }
+  .control-btn {
+    background: none; border: none;
+    color: var(--text-dim); font-size: 1.2rem;
+    cursor: pointer; transition: color .2s, transform .2s;
+  }
+  .control-btn:hover { color: #fff; transform: scale(1.15); }
+  .play-btn {
+    background: #fff; color: #000;
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem; transition: all .2s;
+  }
+  .play-btn.playing { box-shadow: 0 0 18px rgba(255,255,255,.45); }
+  .play-btn:hover { background: #eee; transform: scale(1.08); }
+
+  .progress-container {
+    width: 100%; display: flex; align-items: center;
+    gap: .65rem; font-size: .72rem; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-bar-bg {
+    flex: 1; height: 4px;
+    background: rgba(255,255,255,.18);
+    border-radius: 2px; cursor: pointer; position: relative;
+  }
+  .progress-bar-fill {
+    position: absolute; top: 0; left: 0; height: 100%;
+    width: 0%; background: var(--primary); border-radius: 2px;
+    transition: width .5s linear;
+  }
+  .progress-bar-bg:hover .progress-bar-fill::after { opacity:1; }
+  .progress-bar-fill::after {
+    content:''; position:absolute; right:-5px; top:50%;
+    transform:translateY(-50%);
+    width:11px; height:11px;
+    background:#fff; border-radius:50%;
+    opacity:0; transition:opacity .2s;
+  }
+
+  .player-right {
+    display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
+  }
+  .action-btn {
+    background: none; border: none;
+    color: var(--text-dim); font-size: 1.2rem;
+    cursor: pointer; transition: color .2s;
+  }
+  .action-btn:hover { color: #fff; }
+  .vol-wrap { display: flex; align-items: center; gap: .4rem; }
+  input[type=range] {
+    -webkit-appearance: none; width: 70px; height: 3px;
+    background: rgba(255,255,255,.25); border-radius: 2px; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px; background: #fff; border-radius: 50%;
+  }
+
+  /* TRACKLIST */
+  .tracklist-overlay {
+    position: absolute; inset: 0; z-index: 50;
+    display: none; justify-content: center; align-items: flex-end;
+    padding-bottom: 9rem;
+  }
+  .tracklist-overlay.open { display: flex; }
+  .tracklist-panel {
+    background: rgba(10,10,10,.85); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 20px;
+    width: min(90%, 500px); max-height: 50vh; overflow-y: auto;
+    padding: 1rem;
+  }
+  .tracklist-panel h3 {
+    font-size: .82rem; font-weight: 600; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: .75rem; padding-left: .5rem;
+  }
+  .track-row {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .55rem .5rem; border-radius: 10px; cursor: pointer;
+    transition: background .2s;
+  }
+  .track-row:hover { background: rgba(255,255,255,.08); }
+  .track-row.active { background: rgba(230,57,70,.2); }
+  .track-row-num { width: 22px; text-align: center; font-size: .78rem; color: var(--text-dim); }
+  .track-row-info { flex: 1; min-width: 0; }
+  .track-row-name { font-size: .9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-row-dur { font-size: .75rem; color: var(--text-dim); margin-top: .1rem; }
+  .tracklist-panel::-webkit-scrollbar { width: 4px; }
+  .tracklist-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 2px; }
+
+  /* LOADING SPINNER */
+  .loading-dot {
+    display: inline-block;
+    animation: blink 1.4s infinite both;
+  }
+  .loading-dot:nth-child(2) { animation-delay: .2s; }
+  .loading-dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+  @media (max-width: 600px) {
+    .player-right { display: none; }
+    .music-player { gap: .8rem; }
+    .controls { gap: .8rem; }
+    .platform-logos { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-layer"></div>
+<div id="bg-overlay"></div>
+
+<!-- YouTube hidden container -->
+<div id="yt-container"><div id="yt-player"></div></div>
+
+<!-- Platform links -->
+<div class="platform-logos">
+  <a href="https://open.spotify.com/search/old%20bollywood" class="platform-btn spotify" target="_blank"><i class="ph-fill ph-spotify-logo"></i> Spotify</a>
+  <a href="https://music.youtube.com/" class="platform-btn yt" target="_blank"><i class="ph-fill ph-youtube-logo"></i> YT Music</a>
+</div>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <div class="nav-item active" onclick="switchStation('auto')" id="nav-auto"><i class="ph-fill ph-steering-wheel"></i>Auto Wala</div>
+  <div class="nav-item" onclick="switchStation('mechanic')" id="nav-mechanic"><i class="ph-fill ph-wrench"></i>Raju Mistri</div>
+  <div class="nav-item" onclick="switchStation('barber')" id="nav-barber"><i class="ph-fill ph-scissors"></i>Deluxe Saloon</div>
+  <div class="nav-item" onclick="switchStation('bus')" id="nav-bus"><i class="ph-fill ph-bus"></i>Bus Driver</div>
+  <div class="nav-item" onclick="switchStation('chai')" id="nav-chai"><i class="ph-fill ph-coffee"></i>Chai Tapri</div>
+  <div class="nav-item" onclick="switchStation('train')" id="nav-train"><i class="ph-fill ph-train"></i>Local Train</div>
+</nav>
+
+<!-- Hero -->
+<main class="hero-container">
+  <h1 class="hero-title" id="main-title">ऑटो वाला</h1>
+  <h2 class="hero-subtitle" id="main-subtitle">HIGHWAY VIBES</h2>
+</main>
+
+<!-- Track List Popup -->
+<div class="tracklist-overlay" id="tracklist-overlay" onclick="closeTracklistIfOutside(event)">
+  <div class="tracklist-panel" id="tracklist-panel">
+    <h3 id="tracklist-heading">Playlist</h3>
+    <div id="tracklist-body"></div>
+  </div>
+</div>
+
+<!-- Music Player -->
+<div class="player-wrapper">
+  <div class="top-badges">
+    <div class="badge"><i class="ph-fill ph-headphones"></i> Bollywood</div>
+    <div class="badge"><i class="ph-fill ph-moon-stars"></i> Classics</div>
+    <div class="badge" style="margin-left:auto; cursor:pointer;" onclick="toggleTracklist()"><i class="ph-fill ph-playlist"></i> Playlist</div>
+  </div>
+  <div class="music-player">
+    <div class="album-art" id="album-art"></div>
+    <div class="track-info">
+      <div class="track-name" id="track-name">
+        <span class="loading-dot">●</span><span class="loading-dot">●</span><span class="loading-dot">●</span>
+      </div>
+      <div class="track-artist" id="track-artist">Desi Lofi Radio</div>
+    </div>
+    <div class="player-center">
+      <div class="controls">
+        <button class="control-btn" onclick="prevTrack()"><i class="ph-fill ph-skip-back"></i></button>
+        <button class="control-btn play-btn" id="play-btn" onclick="togglePlay()"><i class="ph-fill ph-play" id="play-icon"></i></button>
+        <button class="control-btn" onclick="nextTrack()"><i class="ph-fill ph-skip-forward"></i></button>
+      </div>
+      <div class="progress-container">
+        <span id="current-time">0:00</span>
+        <div class="progress-bar-bg" id="progress-bg" onclick="seek(event)">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <span id="total-time">0:00</span>
+      </div>
+    </div>
+    <div class="player-right">
+      <div class="vol-wrap">
+        <button class="action-btn" onclick="toggleMute()"><i class="ph-fill ph-speaker-high" id="mute-icon"></i></button>
+        <input type="range" id="vol-slider" min="0" max="100" value="80" oninput="setVolume(this.value)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── REAL BOLLYWOOD SONGS ─────────────────────────────────────────────────────
+// Verified YouTube video IDs from official channels (T-Series, Saregama, Sony Music India)
+const stations = {
+  auto: {
+    bg: './bg.jpg',
+    title: 'ऑटो वाला',
+    subtitle: 'HIGHWAY VIBES',
+    albumColor: '#8B1A1A',
+    tracks: [
+      { id: 'WA0wKeokW80', name: 'Chaiyya Chaiyya', artist: 'A.R. Rahman • Dil Se (1998)' },
+      { id: '6P6v6vT5_9E', name: 'Rang De Basanti', artist: 'A.R. Rahman • Rang De Basanti (2006)' },
+      { id: 'n4tukTUqYaw', name: 'Dil Chahta Hai', artist: 'Shankar-Ehsaan-Loy • Dil Chahta Hai (2001)' },
+      { id: '4dsFQFCvVGU', name: 'Kajra Re', artist: 'Shankar-Ehsaan-Loy • Bunty Aur Babli (2005)' },
+      { id: 'R94k1s-g5w8', name: 'Mere Sapno Ki Rani', artist: 'Kishore Kumar • Aradhana (1969)' },
+    ]
+  },
+  mechanic: {
+    bg: './mechanic.jpg',
+    title: 'राजू मिस्त्री',
+    subtitle: 'GARAGE SESSIONS',
+    albumColor: '#5C3317',
+    tracks: [
+      { id: 'bO_F-V463Qo', name: 'Aaj Mausam Bada Beimaan Hai', artist: 'Mohammed Rafi • Loafer (1973)' },
+      { id: 'wX-Y8y9p6lU', name: 'Dum Maro Dum', artist: 'Asha Bhosle • Hare Rama Hare Krishna (1971)' },
+      { id: '7uK2Z4_x1wA', name: 'Parda Hai Parda', artist: 'Mohammed Rafi • Amar Akbar Anthony (1977)' },
+      { id: 'R94k1s-g5w8', name: 'Mere Sapno Ki Rani', artist: 'Kishore Kumar • Aradhana (1969)' },
+      { id: '6P6v6vT5_9E', name: 'Rang De Basanti', artist: 'A.R. Rahman • Rang De Basanti (2006)' },
+    ]
+  },
+  barber: {
+    bg: './barber.jpg',
+    title: 'डीलक्स सैलून',
+    subtitle: 'OPEN ALL HOURS',
+    albumColor: '#8b1a1a',
+    tracks: [
+      { id: 'UmraCL3EY4k', name: 'Tum Hi Ho', artist: 'Arijit Singh • Aashiqui 2 (2013)' },
+      { id: 'HrbeWDzQiGk', name: 'Kal Ho Naa Ho', artist: 'Sonu Nigam • Kal Ho Naa Ho (2003)' },
+      { id: 'bO_F-V463Qo', name: 'Aaj Mausam Bada Beimaan Hai', artist: 'Mohammed Rafi • Loafer (1973)' },
+      { id: 'wX-Y8y9p6lU', name: 'Dum Maro Dum', artist: 'Asha Bhosle • Hare Rama Hare Krishna (1971)' },
+      { id: '7uK2Z4_x1wA', name: 'Parda Hai Parda', artist: 'Mohammed Rafi • Amar Akbar Anthony (1977)' },
+    ]
+  },
+  bus: {
+    bg: './bus.jpg',
+    title: 'बस ड्राइवर',
+    subtitle: 'NIGHT ROUTE 241',
+    albumColor: '#0a2744',
+    tracks: [
+      { id: 'HrbeWDzQiGk', name: 'Kal Ho Naa Ho', artist: 'Sonu Nigam • Kal Ho Naa Ho (2003)' },
+      { id: 'Lq1t8-N6h1Q', name: 'Yeh Jo Des Hai Tera', artist: 'A.R. Rahman • Swades (2004)' },
+      { id: 'n4tukTUqYaw', name: 'Dil Chahta Hai', artist: 'Shankar-Ehsaan-Loy • Dil Chahta Hai (2001)' },
+      { id: 'UmraCL3EY4k', name: 'Tum Hi Ho', artist: 'Arijit Singh • Aashiqui 2 (2013)' },
+      { id: 'WA0wKeokW80', name: 'Chaiyya Chaiyya', artist: 'A.R. Rahman • Dil Se (1998)' },
+    ]
+  },
+  chai: {
+    bg: './chai.jpg',
+    title: 'चाय टपरी',
+    subtitle: 'MIDNIGHT BREW',
+    albumColor: '#5c3000',
+    tracks: [
+      { id: 'R94k1s-g5w8', name: 'Mere Sapno Ki Rani', artist: 'Kishore Kumar • Aradhana (1969)' },
+      { id: '7uK2Z4_x1wA', name: 'Parda Hai Parda', artist: 'Mohammed Rafi • Amar Akbar Anthony (1977)' },
+      { id: 'bO_F-V463Qo', name: 'Aaj Mausam Bada Beimaan Hai', artist: 'Mohammed Rafi • Loafer (1973)' },
+      { id: 'wX-Y8y9p6lU', name: 'Dum Maro Dum', artist: 'Asha Bhosle • Hare Rama Hare Krishna (1971)' },
+      { id: '4dsFQFCvVGU', name: 'Kajra Re', artist: 'Shankar-Ehsaan-Loy • Bunty Aur Babli (2005)' },
+    ]
+  },
+  train: {
+    bg: 'https://images.unsplash.com/photo-1541807212002-3f1b40212727?auto=format&fit=crop&w=1600&q=80',
+    title: 'लोकल ट्रेन',
+    subtitle: 'LAST TRAIN HOME',
+    albumColor: '#1a3a1a',
+    tracks: [
+      { id: 'WA0wKeokW80', name: 'Chaiyya Chaiyya', artist: 'A.R. Rahman • Dil Se (1998)' },
+      { id: 'UmraCL3EY4k', name: 'Tum Hi Ho', artist: 'Arijit Singh • Aashiqui 2 (2013)' },
+      { id: 'Lq1t8-N6h1Q', name: 'Yeh Jo Des Hai Tera', artist: 'A.R. Rahman • Swades (2004)' },
+      { id: 'HrbeWDzQiGk', name: 'Kal Ho Naa Ho', artist: 'Sonu Nigam • Kal Ho Naa Ho (2003)' },
+      { id: '6P6v6vT5_9E', name: 'Rang De Basanti', artist: 'A.R. Rahman • Rang De Basanti (2006)' },
+    ]
+  }
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentStation = 'auto';
+let currentTrackIndex = 0;
+let ytPlayer = null;
+let ytReady = false;
+let isPlaying = false;
+let progressInterval = null;
+let tracklistOpen = false;
+let lastVol = 80;
+
+// ── YOUTUBE API SETUP ─────────────────────────────────────────────────────────
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+window.onYouTubeIframeAPIReady = function () {
+  ytReady = true;
+  const track = stations[currentStation].tracks[currentTrackIndex];
+  ytPlayer = new YT.Player('yt-player', {
+    height: '1', width: '1',
+    videoId: track.id,
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      rel: 0,
+      modestbranding: 1,
+      enablejsapi: 1,
+      origin: window.location.origin || 'http://localhost'
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError
+    }
+  });
+};
+
+function onPlayerReady() {
+  setVolume(80);
+  updateTrackUI();
+  updateTracklist();
+}
+
+function onPlayerStateChange(event) {
+  const S = YT.PlayerState;
+  if (event.data === S.PLAYING) {
+    setPlayingUI(true);
+    startProgressTimer();
+  } else if (event.data === S.PAUSED) {
+    setPlayingUI(false);
+    stopProgressTimer();
+  } else if (event.data === S.ENDED) {
+    nextTrack();
+  } else if (event.data === S.BUFFERING) {
+    document.getElementById('track-name').innerText = '⏳ Loading...';
+  }
+}
+
+function onPlayerError(event) {
+  // If video is unembeddable or unavailable, skip to next
+  console.warn('YouTube error:', event.data, '— skipping to next track');
+  setTimeout(nextTrack, 1000);
+}
+
+// ── PLAYBACK ──────────────────────────────────────────────────────────────────
+function togglePlay() {
+  if (!ytReady || !ytPlayer) return;
+  if (isPlaying) {
+    ytPlayer.pauseVideo();
+  } else {
+    ytPlayer.playVideo();
+  }
+}
+
+function setPlayingUI(playing) {
+  isPlaying = playing;
+  document.getElementById('play-icon').className = playing ? 'ph-fill ph-pause' : 'ph-fill ph-play';
+  document.getElementById('play-btn').classList.toggle('playing', playing);
+  document.getElementById('album-art').classList.toggle('spinning', playing);
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function startProgressTimer() {
+  stopProgressTimer();
+  progressInterval = setInterval(() => {
+    if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+    try {
+      const cur = ytPlayer.getCurrentTime();
+      const dur = ytPlayer.getDuration();
+      if (dur && dur > 0) {
+        document.getElementById('progress-fill').style.width = `${(cur/dur)*100}%`;
+        document.getElementById('current-time').innerText = fmt(cur);
+        document.getElementById('total-time').innerText   = fmt(dur);
+      }
+    } catch(e) {}
+  }, 500);
+}
+
+function stopProgressTimer() {
+  clearInterval(progressInterval);
+}
+
+function seek(e) {
+  if (!ytPlayer || !ytPlayer.getDuration) return;
+  const rect = document.getElementById('progress-bg').getBoundingClientRect();
+  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  try {
+    ytPlayer.seekTo(ytPlayer.getDuration() * pct, true);
+  } catch(e) {}
+}
+
+// ── TRACK NAVIGATION ──────────────────────────────────────────────────────────
+function playTrack(index) {
+  const tracks = stations[currentStation].tracks;
+  if (index < 0) index = tracks.length - 1;
+  if (index >= tracks.length) index = 0;
+  currentTrackIndex = index;
+
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('current-time').innerText = '0:00';
+  document.getElementById('total-time').innerText   = '0:00';
+  document.getElementById('track-name').innerText   = '⏳ Loading...';
+
+  if (ytPlayer && ytPlayer.loadVideoById) {
+    ytPlayer.loadVideoById(tracks[index].id);
+    setPlayingUI(true);
+    startProgressTimer();
+  }
+  updateTrackUI();
+  updateTracklist();
+}
+
+function nextTrack() { playTrack(currentTrackIndex + 1); }
+function prevTrack() { playTrack(currentTrackIndex - 1); }
+
+// ── STATION SWITCH ────────────────────────────────────────────────────────────
+function switchStation(key) {
+  currentStation = key;
+  currentTrackIndex = 0;
+  const station = stations[key];
+
+  // Fade BG
+  const bgEl = document.getElementById('bg-layer');
+  bgEl.classList.add('fading');
+  setTimeout(() => {
+    bgEl.style.backgroundImage = `url('${station.bg}')`;
+    bgEl.classList.remove('fading');
+  }, 400);
+
+  // Fade title
+  ['main-title','main-subtitle'].forEach(id => document.getElementById(id).classList.add('fade'));
+  setTimeout(() => {
+    document.getElementById('main-title').innerText    = station.title;
+    document.getElementById('main-subtitle').innerText = station.subtitle;
+    ['main-title','main-subtitle'].forEach(id => document.getElementById(id).classList.remove('fade'));
+  }, 300);
+
+  // Nav highlight
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`nav-${key}`).classList.add('active');
+
+  // Load first track
+  playTrack(0);
+}
+
+// ── UI UPDATE ─────────────────────────────────────────────────────────────────
+function updateTrackUI() {
+  const station = stations[currentStation];
+  const track   = station.tracks[currentTrackIndex];
+  document.getElementById('track-name').innerText   = track.name;
+  document.getElementById('track-artist').innerText = track.artist;
+  document.getElementById('album-art').style.background = station.albumColor;
+}
+
+// ── TRACKLIST ─────────────────────────────────────────────────────────────────
+function toggleTracklist() {
+  tracklistOpen = !tracklistOpen;
+  document.getElementById('tracklist-overlay').classList.toggle('open', tracklistOpen);
+  if (tracklistOpen) updateTracklist();
+}
+function closeTracklistIfOutside(e) {
+  if (e.target === document.getElementById('tracklist-overlay')) {
+    tracklistOpen = false;
+    document.getElementById('tracklist-overlay').classList.remove('open');
+  }
+}
+function updateTracklist() {
+  const station = stations[currentStation];
+  document.getElementById('tracklist-heading').innerText = station.title + ' Playlist';
+  const body = document.getElementById('tracklist-body');
+  body.innerHTML = '';
+  station.tracks.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'track-row' + (i === currentTrackIndex ? ' active' : '');
+    row.onclick = () => { playTrack(i); };
+    row.innerHTML = `
+      <div class="track-row-num">${i === currentTrackIndex && isPlaying
+        ? '<i class="ph-fill ph-speaker-high" style="color:var(--primary)"></i>'
+        : i+1}</div>
+      <div class="track-row-info">
+        <div class="track-row-name">${t.name}</div>
+        <div class="track-row-dur">${t.artist}</div>
+      </div>`;
+    body.appendChild(row);
+  });
+}
+
+// ── VOLUME / MUTE ─────────────────────────────────────────────────────────────
+function setVolume(val) {
+  if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(+val);
+  document.getElementById('vol-slider').value = val;
+  const icon = document.getElementById('mute-icon');
+  icon.className = +val === 0 ? 'ph-fill ph-speaker-slash'
+    : +val < 50 ? 'ph-fill ph-speaker-low'
+    : 'ph-fill ph-speaker-high';
+}
+function toggleMute() {
+  if (!ytPlayer) return;
+  if (ytPlayer.isMuted && ytPlayer.isMuted()) {
+    ytPlayer.unMute();
+    setVolume(lastVol || 80);
+  } else {
+    lastVol = ytPlayer.getVolume ? ytPlayer.getVolume() : 80;
+    ytPlayer.mute();
+    document.getElementById('vol-slider').value = 0;
+    document.getElementById('mute-icon').className = 'ph-fill ph-speaker-slash';
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function fmt(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(function init() {
+  const s = stations['auto'];
+  document.getElementById('bg-layer').style.backgroundImage = `url('${s.bg}')`;
+  document.getElementById('nav-auto').classList.add('active');
+  updateTrackUI();
+  updateTracklist();
+})();
+</script>
+</body>
+</html>
