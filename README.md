@@ -98,6 +98,3 @@ The design philosophy: *Bold Hindi typography + cinematic Indian street illustra
 
 ---
 
-## 📄 License
-
-MIT License — feel free to fork, remix, and vibe! 🙏
